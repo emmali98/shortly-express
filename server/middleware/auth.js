@@ -13,6 +13,7 @@ module.exports.createSession = (req, res, next) => {
       .then((session) => {
         req.session = session;
         res.cookies = { shortlyid: { value: session.hash } };
+        res.set('Set-Cookie', `shortlyid=${session.hash}`);
         next();
       });
   }
@@ -27,10 +28,11 @@ module.exports.createSession = (req, res, next) => {
           .then((session) => {
             req.session = session;
             res.cookies = { shortlyid: { value: session.hash } };
+            res.set('Set-Cookie', `shortlyid=${session.hash}`);
             next();
           });
       }
-      req.session = session; // bug here?
+      req.session = session;
       next();
     });
 
