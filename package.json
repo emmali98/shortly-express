@@ -11,7 +11,8 @@
   "scripts": {
     "postinstall": "curl -s https://raw.githubusercontent.com/reactorcore/pomander/master/bin/install | bash && ./node_modules/.bin/jsdoc ./server -r -d docs",
     "start": "nodemon --ignore node_modules server",
-    "test": "mocha --bail --reporter nyan test/ServerSpec.js; pkill -n node;",
+    "test": "mocha --bail test/ServerSpec.js; pkill -n node;",
+    "oldtest": "mocha --bail --reporter nyan test/ServerSpec.js; pkill -n node;",
     "lint": "eslint ./"
   },
   "dependencies": {
@@ -29,6 +30,7 @@
     "chai": "^3.5.0",
     "eslint-config-hackreactor": "git://github.com/reactorcore/eslint-config-hackreactor",
     "jsdoc": "^3.5.3",
-    "mocha": "^2.4.5"
+    "mocha": "^8.1.3",
+    "nodemon": "^2.0.4"
   }
 }
