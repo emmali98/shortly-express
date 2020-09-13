@@ -12,6 +12,14 @@
       <input type="submit" value="Login">
     </div>
 </form>
+<script>
+  if (window.location.href.includes('fail')) {
+    var alert = document.createElement('p');
+    var node = document.createTextNode('Invalid credentials; please try again');
+    alert.appendChild(node);
+    document.body.appendChild(alert);
+  }
+</script>
 <p>
   <a href="/signup">Create an Account &rarr;</a>
 <p>

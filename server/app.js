@@ -140,7 +140,7 @@ var loginHelper = (req, res, next) => {
     })
     .catch((string) => {
       console.log(string);
-      res.redirect('/login'); // yell at user with the string somehow (later)
+      res.redirect('/login?fail=1'); // yell at user with the string somehow (later)
     });
 };
 
