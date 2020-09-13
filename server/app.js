@@ -20,6 +20,9 @@ app.use(cookieParser, Auth.createSession);
 
 app.get('/',
   (req, res) => {
+    if (!models.Sessions.isLoggedIn(req.session)) {
+      return res.redirect('/login');
+    }
     res.render('index');
   });
 
@@ -34,9 +37,9 @@ app.get('/create',
 
 app.get('/links',
   (req, res, next) => {
-    // if (!models.Sessions.isLoggedIn(req.session)) {
-    //   return res.redirect('/login');
-    // }
+    if (!models.Sessions.isLoggedIn(req.session)) {
+      return res.redirect('/login');
+    }
     return models.Links.getAll()
       .then(links => {
         res.status(200).send(links);
@@ -48,10 +51,10 @@ app.get('/links',
 
 app.post('/links',
   (req, res, next) => {
-    // if (!models.Sessions.isLoggedIn(req.session)) {
-    //   console.log('not logged in');
-    //   return res.redirect('/login');
-    // }
+    if (!models.Sessions.isLoggedIn(req.session)) {
+      console.log('not logged in');
+      return res.redirect('/login');
+    }
     var url = req.body.url;
     if (!models.Links.isValidUrl(url)) {
     // send back a 404 if link is not valid
@@ -98,40 +101,46 @@ app.get('/login', (req, res) => {
   res.render('login');
 });
 
+app.get('/logout', (req, res) => {
+  return models.Sessions.delete({ hash: req.session.hash })
+    .then(() => {
+      var date = new Date();
+      res.set('Set-Cookie', `shortlyid=${req.session.hash}; Expires=${date.toUTCString()}`);
+    })
+    .then(() => {
+      res.redirect('/');
+    })
+    .error((err) => {
+      throw err;
+    });
+});
+
 var loginHelper = (req, res, next) => {
   return models.Users.get({ username: req.body.username })
     .then((result) => {
       if (!result) {
         throw ('Username does not exist');
       }
-      console.log('checked username');
       return models.Users.compare(req.body.password, result.password, result.salt);
     })
     .then((result) => {
       if (!result) {
         throw ('Password is incorrect');
       }
-      console.log('checked password');
       return models.Users.get({ username: req.body.username });
     })
     .then((user)=> {
-      console.log('about to update session');
-      console.log(req.session.hash);
       return models.Sessions.update({ hash: req.session.hash }, { userId: user.id });
     })
     .then(() => {
-      console.log('should redirect you to homepage');
       res.redirect('/');
     })
     .error((err) => {
-      console.log('there was an error');
       res.status(500).send(err);
     })
     .catch((string) => {
-      console.log('something was caught');
       console.log(string);
       res.redirect('/login'); // yell at user with the string somehow (later)
-      // res.status(500).send(string);
     });
 };
 

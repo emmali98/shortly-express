@@ -12,13 +12,13 @@ module.exports.createSession = (req, res, next) => {
       })
       .then((session) => {
         req.session = session;
-        res.cookies = { shortlyid: { value: session.hash } };
+        res.cookies = { shortlyid: session.hash };
         res.set('Set-Cookie', `shortlyid=${session.hash}`);
         next();
       });
   }
 
-  return models.Sessions.get({ hash: req.cookies.shortlyid.value })
+  return models.Sessions.get({ hash: req.cookies.shortlyid })
     .then((session) => {
       if (!session) {
         return models.Sessions.create()
@@ -27,17 +27,17 @@ module.exports.createSession = (req, res, next) => {
           })
           .then((session) => {
             req.session = session;
-            res.cookies = { shortlyid: { value: session.hash } };
+            res.cookies = { shortlyid: session.hash };
             res.set('Set-Cookie', `shortlyid=${session.hash}`);
             next();
           });
+      } else {
+        req.session = session;
+        next();
       }
-      req.session = session;
-      next();
     });
 
   // return models.Sessions.get({ hash: req.cookies.shortlyid })
-
 };
 
 /************************************************************/
